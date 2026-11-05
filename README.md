@@ -1,8 +1,6 @@
 ### DSH Message Recall
 
-![language-typescript](https://img.shields.io/badge/language-typescript-orange.svg)
-
-![dsh-plugin](https://img.shields.io/badge/dsh-plugin-4D6BFE)
+![language-typescript](https://img.shields.io/badge/language-typescript-orange.svg) ![dsh-plugin](https://img.shields.io/badge/dsh-plugin-4D6BFE)
 
 ### 介绍
 
