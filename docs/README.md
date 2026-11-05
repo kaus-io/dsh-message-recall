@@ -4,19 +4,28 @@
 
 ## 安装
 
-先安装并运行 DSH Web，再克隆本仓库：
+先安装并运行 DSH Web；插件声明兼容 DSH `>=0.2.1-rc.3`。在运行 Web 的 profile 中安装，`web` 可替换为实际 profile 名：
+
+```sh
+dsh plugin --profile web add @kaus-io/dsh-message-recall@1.0.0-alpha01
+```
+
+安装后刷新页面；若宿主提示需要重启，按提示重载。
+
+若要从源码开发，克隆本仓库并构建，然后在 DSH 插件管理中安装本地组合包：
 
 ```sh
 git clone https://github.com/kaus-io/dsh-message-recall.git
+cd dsh-message-recall
+pnpm install
+pnpm run build
 ```
-
-在 DSH 插件管理中选择安装组合包，填写仓库的**实际绝对路径**：
 
 ```text
 link:/绝对路径/dsh-message-recall
 ```
 
-安装到运行 Web 的 profile 后刷新页面；若宿主提示需要重启，按提示重载。仓库已包含运行产物，使用时无需先构建。本地链接依赖仓库目录，移动或删除会影响插件。
+npm 与本地链接二选一，替换前先移除旧来源。仓库已包含运行产物，使用时无需先构建。本地链接依赖仓库目录，移动或删除会影响插件。
 
 ## 快速使用
 
@@ -39,7 +48,7 @@ link:/绝对路径/dsh-message-recall
 可在插件管理中卸载；使用命令行时，将 `web` 替换为实际安装的 profile：
 
 ```sh
-dsh plugin --profile web remove @local/dsh-message-recall
+dsh plugin --profile web remove @kaus-io/dsh-message-recall
 ```
 
 ## 开发与验证
@@ -50,7 +59,9 @@ dsh plugin --profile web remove @local/dsh-message-recall
 pnpm install
 pnpm run build
 pnpm run typecheck
-node smoke.mjs
+pnpm test
 ```
+
+`pnpm test` 会先编译工具与测试脚本，再检查提交产物是否与源码一致、运行版本脚本测试，并执行客户端 smoke。工具与测试脚本以 TypeScript 写在 `*.ts`，`pnpm run build:tools` 用 esbuild 编译成同名 `.mjs` 后再执行；生成的 `.mjs` 不入库。
 
 报告问题时，请提供 DSH 版本、复现步骤及已脱敏的错误信息。交互参考了 [opencode](https://github.com/anomalyco/opencode) 的回退体验，以及 [DSH-EasyRewrite](https://github.com/Renzic-Stone/DSH-EasyRewrite) 的按钮位置。

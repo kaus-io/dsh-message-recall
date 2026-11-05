@@ -2,18 +2,32 @@
  * Workspace smoke test: loads the client module the way the browser module
  * loader does, applies it to a fake Client context, and renders the registered
  * `user` row once with a minimal React shim. Not a browser test.
+ *
+ * The fake services and React shim are intentionally dynamic, so their
+ * boundaries are typed loosely; the assertions below are the real contract.
  */
-import { readFile } from 'node:fs/promises'
-import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+/** 浏览器模块表里注册的插件模块。 / The plugin module registered with the browser module table. */
+interface ModuleDefinition {
+  id: string
+  factory: (require: (id: string) => unknown) => ClientExports
+}
+
+/** 客户端模块导出的 `apply` / `inject` 面。 / The `apply` / `inject` face a client module exports. */
+interface ClientExports {
+  apply: (ctx: unknown) => void
+  inject: string[]
+}
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const entry = path.join(here, 'client.js')
 
-let captured
-globalThis.window = {
+let captured: ModuleDefinition | undefined
+;(globalThis as unknown as { window?: unknown }).window = {
   __ModuleLoader__: {
-    load(definition) {
+    load(definition: ModuleDefinition) {
       captured = definition
     },
   },
@@ -22,26 +36,29 @@ globalThis.window = {
 await import(entry)
 
 if (captured === undefined) throw new Error('module loader was not called')
-if (captured.id !== '@local/dsh-message-recall') throw new Error(`unexpected module id: ${captured.id}`)
+if (captured.id !== '@kaus-io/dsh-message-recall') throw new Error(`unexpected module id: ${captured.id}`)
 
-const element = (type, props) => ({ type, props: props ?? {} })
+type AnyProps = Record<string, any>
+
+const element = (type: unknown, props: AnyProps | null): unknown => ({ type, props: props ?? {} })
+
 const React = {
-  createElement(type, props, ...children) {
+  createElement(type: unknown, props: AnyProps | null, ...children: unknown[]): unknown {
     return { type, props: { ...(props ?? {}), children: children.length <= 1 ? children[0] : children } }
   },
-  useMemo(factory) {
+  useMemo(factory: () => unknown): unknown {
     return factory()
   },
-  useCallback(fn) {
+  useCallback(fn: unknown): unknown {
     return fn
   },
-  useState(initial) {
-    return [typeof initial === 'function' ? initial() : initial, () => {}]
+  useState(initial: unknown): unknown {
+    return [typeof initial === 'function' ? (initial as () => unknown)() : initial, () => {}]
   },
-  useRef(initial) {
+  useRef(initial: unknown): { current: unknown } {
     return { current: initial }
   },
-  useEffect() {},
+  useEffect(): void {},
 }
 const jsxRuntime = { jsx: element, jsxs: element, Fragment: Symbol('Fragment') }
 
@@ -54,35 +71,38 @@ const exports = captured.factory((id) => {
 if (typeof exports.apply !== 'function') throw new Error('apply is not exported')
 if (!Array.isArray(exports.inject) || !exports.inject.includes('slots')) throw new Error('bad inject face')
 
-const effects = []
-let registered
+const effects: Array<{ label: string; dispose: () => void }> = []
+let registered: { options: AnyProps; component: (props: AnyProps) => unknown } | undefined
+const locale = {
+  dictionaries: undefined as { namespace?: string; dicts?: unknown } | undefined,
+  register(namespace: string, dicts: unknown) {
+    this.dictionaries = { namespace, dicts }
+    return () => {}
+  },
+}
+const slots = {
+  injected: undefined as string | undefined,
+  inject(key: string, callback: () => void) {
+    this.injected = key
+    callback()
+    return () => {}
+  },
+  register(options: AnyProps, component: (props: AnyProps) => unknown) {
+    registered = { options, component }
+    return () => {}
+  },
+}
 const ctx = {
-  effect(factory, label) {
+  effect(factory: () => () => void, label: string) {
     effects.push({ label, dispose: factory() })
   },
-  locale: {
-    dictionaries: undefined,
-    register(namespace, dicts) {
-      this.dictionaries = { namespace, dicts }
-      return () => {}
-    },
-  },
-  slots: {
-    inject(key, callback) {
-      this.injected = key
-      callback()
-      return () => {}
-    },
-    register(options, component) {
-      registered = { options, component }
-      return () => {}
-    },
-  },
+  locale,
+  slots,
   get() {
     return undefined
   },
   sessions: {
-    async fork(args) {
+    async fork(args: { sessionId: string }) {
       return `child-of-${args.sessionId}`
     },
     binding() {
@@ -111,21 +131,21 @@ const tree = registered.component({
     anchorSeq: 7,
     data: { seq: 7, time: Date.now(), content: [{ type: 'text', text: 'EasyRewrite 测试' }] },
   },
-  renderFactorySlot(name, input) {
+  renderFactorySlot(name: string, input: AnyProps) {
     if (name !== 'conversation.chat.user.content') throw new Error(`unexpected factory: ${name}`)
     if (input.content.text !== 'EasyRewrite 测试') throw new Error('bubble text was not carried through')
     return { type: 'factory', name, input }
   },
   loadImage() {},
-  t: (key, params) => (params === undefined ? key : `${key}(${JSON.stringify(params)})`),
+  t: (key: string, params?: Record<string, string | number>) => (params === undefined ? key : `${key}(${JSON.stringify(params)})`),
   sessionId: 'session-a',
-  useChat: (selector) => selector({ nodes: { values: () => [] } }),
+  useChat: (selector: (value: AnyProps) => unknown) => selector({ nodes: { values: () => [] } }),
   useAccess: () => true,
-  useSessionStatus: (selector) => selector(new Map([['session-a', { running: false }]])),
+  useSessionStatus: (selector: (value: Map<string, { running: boolean }>) => unknown) => selector(new Map([['session-a', { running: false }]])),
   recall: async () => 'child',
 })
 
-function walk(node, visit) {
+function walk(node: any, visit: (node: any) => void): void {
   if (node === null || node === undefined) return
   if (Array.isArray(node)) {
     for (const child of node) walk(child, visit)
@@ -135,14 +155,14 @@ function walk(node, visit) {
   if (node.props !== undefined) walk(node.props.children, visit)
 }
 
-const buttons = []
+const buttons: string[] = []
 walk(tree, (node) => {
   if (node.props?.type === 'button') buttons.push(node.props['aria-label'])
 })
 if (buttons.length !== 2) throw new Error(`expected recall+copy buttons, saw ${JSON.stringify(buttons)}`)
 if (!buttons.includes('recall') || !buttons.includes('copy')) throw new Error(`unexpected buttons: ${JSON.stringify(buttons)}`)
 
-const clock = []
+const clock: string[] = []
 walk(tree, (node) => {
   if (typeof node === 'string') clock.push(node)
 })
@@ -169,7 +189,7 @@ const richTree = registered.component({
       skillNames: ['skill-a'],
     },
   },
-  renderFactorySlot(name, input) {
+  renderFactorySlot(name: string, input: AnyProps) {
     if (input.content.text !== '看图 再改一下') throw new Error('text join changed')
     if (input.content.attachments.length !== 2) throw new Error('attachments were not carried through')
     if (input.facts.sessionLabels?.[0] !== 'src/app.ts') throw new Error('reference labels missing')
@@ -177,21 +197,21 @@ const richTree = registered.component({
     return { type: 'factory', name, input }
   },
   loadImage() {},
-  t: (key, params) => (params === undefined ? key : `${key}(${JSON.stringify(params)})`),
+  t: (key: string, params?: Record<string, string | number>) => (params === undefined ? key : `${key}(${JSON.stringify(params)})`),
   sessionId: 'session-b',
-  useChat: (selector) => selector({ nodes: { values: () => [{ anchorSeq: 30, kind: 'user' }] } }),
+  useChat: (selector: (value: AnyProps) => unknown) => selector({ nodes: { values: () => [{ anchorSeq: 30, kind: 'user' }] } }),
   useAccess: () => false,
-  useSessionStatus: (selector) => selector(new Map([['session-b', { running: true }]])),
+  useSessionStatus: (selector: (value: Map<string, { running: boolean }>) => unknown) => selector(new Map([['session-b', { running: true }]])),
   recall: async () => 'child',
 })
 
-const richButtons = []
+const richButtons: string[] = []
 walk(richTree, (node) => {
   if (node.props?.type === 'button') richButtons.push(node.props['aria-label'])
 })
 if (richButtons.length !== 1 || richButtons[0] !== 'copy') throw new Error(`access denied should leave only copy: ${JSON.stringify(richButtons)}`)
 
-const classes = []
+const classes: string[] = []
 walk(richTree, (node) => {
   if (typeof node.props?.className === 'string') classes.push(node.props.className)
 })

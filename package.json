@@ -1,9 +1,20 @@
 {
-  "name": "@local/dsh-message-recall",
-  "version": "1.0.0",
-  "private": true,
+  "name": "@kaus-io/dsh-message-recall",
+  "version": "1.0.0-alpha01",
   "description": "Recall a sent message: rewinds the conversation to just before it and puts its text back in the composer.",
   "type": "module",
+  "license": "MIT",
+  "packageManager": "pnpm@10.28.2",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kaus-io/dsh-message-recall.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "dsh": ">=0.2.1-rc.3"
+  },
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",
@@ -14,6 +25,9 @@
     "index.js",
     "client.js",
     "src",
+    "README.md",
+    "docs/README.md",
+    "CHANGELOG.md",
     "cordis.patch.yml",
     "locale/*.json",
     "icon.svg"
@@ -33,8 +47,13 @@
     }
   },
   "scripts": {
-    "build": "node scripts/build.mjs",
-    "typecheck": "tsc -p tsconfig.json"
+    "build": "pnpm run build:tools && node scripts/build.mjs",
+    "build:tools": "esbuild smoke.ts scripts/build.ts scripts/check-versions.ts scripts/dist-tag.ts tests/check-versions.test.ts tests/dist-tag.test.ts --bundle --packages=external --format=esm --platform=node --target=node22 --outdir=. --outbase=. --out-extension:.js=.mjs --log-level=warning",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.tools.json",
+    "test": "pnpm run build:tools && node --test tests/*.test.mjs && node smoke.mjs",
+    "smoke": "pnpm run build:tools && node smoke.mjs",
+    "check:versions": "pnpm run build:tools && node scripts/check-versions.mjs",
+    "dist-tag": "pnpm run build:tools && node scripts/dist-tag.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",

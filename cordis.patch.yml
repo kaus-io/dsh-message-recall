@@ -1,4 +1,4 @@
 # Message-recall bundle layer: mounts the plugin row.
 - insert:
     - id: dsh-message-recall
-      name: '@local/dsh-message-recall'
+      name: '@kaus-io/dsh-message-recall'

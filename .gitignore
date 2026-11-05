@@ -1,2 +1,7 @@
 node_modules/
 *.log
+
+# 由 *.ts 编译出的工具与测试产物 / Compiled tooling and test output
+/smoke.mjs
+/scripts/*.mjs
+/tests/*.mjs

@@ -19,7 +19,7 @@ import type { ReactElement, ReactNode } from 'react'
 /** Client locale namespace owned by this plugin. */
 const NS = 'messageRecall'
 /** Stable style-tag identity; one tag per installed plugin generation. */
-const STYLE_ID = '@local/dsh-message-recall/MessageRecall.css'
+const STYLE_ID = '@kaus-io/dsh-message-recall/MessageRecall.css'
 
 /** Translate seat handed to the slot component by the Client locale service. */
 type Translate = (key: string, params?: Readonly<Record<string, string | number>>) => string
@@ -173,7 +173,7 @@ const CSS = [
 function installStyles(): () => void {
   if (typeof document === 'undefined') return () => {}
   const tag = document.createElement('style')
-  tag.dataset.plugin = '@local/dsh-message-recall'
+  tag.dataset.plugin = '@kaus-io/dsh-message-recall'
   tag.dataset.pluginCss = STYLE_ID
   tag.textContent = CSS
   document.head.appendChild(tag)
