@@ -1,0 +1,348 @@
+window.__ModuleLoader__.load({ id: "@local/dsh-message-recall", factory: (require) => { const module = { exports: {} }; const exports = module.exports;
+"use strict";
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/client.tsx
+var client_exports = {};
+__export(client_exports, {
+  apply: () => apply,
+  inject: () => inject
+});
+module.exports = __toCommonJS(client_exports);
+var import_react = require("react");
+var import_jsx_runtime = require("react/jsx-runtime");
+var NS = "messageRecall";
+var STYLE_ID = "@local/dsh-message-recall/MessageRecall.css";
+var zh = {
+  copy: "\u590D\u5236",
+  copied: "\u5DF2\u590D\u5236",
+  recall: "\u64A4\u56DE\u8FD9\u6761\u6D88\u606F",
+  recallUnavailable: "\u5F53\u524D\u65E0\u6CD5\u64A4\u56DE\uFF1A\u8BF7\u7B49\u5F85\u672C\u8F6E\u56DE\u590D\u7ED3\u675F",
+  recallFirst: "\u8FD9\u662F\u672C\u4F1A\u8BDD\u7684\u7B2C\u4E00\u6761\u6D88\u606F\uFF0C\u65E0\u6CD5\u64A4\u56DE",
+  confirmOne: "\u64A4\u56DE\u8FD9\u6761\u6D88\u606F\uFF1F",
+  confirmMore: "\u64A4\u56DE\u8FD9\u6761\u6D88\u606F\u53CA\u5176\u540E {count} \u6761\u63D0\u95EE\uFF1F",
+  confirm: "\u786E\u5B9A",
+  cancel: "\u53D6\u6D88",
+  recalling: "\u6B63\u5728\u64A4\u56DE\u2026",
+  failed: "\u64A4\u56DE\u5931\u8D25\uFF1A{message}",
+  "clock.md": "{m}\u6708{d}\u65E5",
+  "clock.ymd": "{y}\u5E74{m}\u6708{d}\u65E5"
+};
+var en = {
+  copy: "Copy",
+  copied: "Copied",
+  recall: "Recall this message",
+  recallUnavailable: "Not now: wait for the running turn to finish",
+  recallFirst: "The first message of a conversation cannot be recalled",
+  confirmOne: "Recall this message?",
+  confirmMore: "Recall this message and the {count} questions after it?",
+  confirm: "Recall",
+  cancel: "Cancel",
+  recalling: "Recalling\u2026",
+  failed: "Recall failed: {message}",
+  "clock.md": "{m}/{d}",
+  "clock.ymd": "{y}/{m}/{d}"
+};
+var S = {
+  row: "dshRecall_row",
+  later: "dshRecall_later",
+  actionRow: "dshRecall_actionRow",
+  time: "dshRecall_time",
+  action: "dshRecall_action",
+  confirm: "dshRecall_confirm",
+  confirmText: "dshRecall_confirmText",
+  confirmButton: "dshRecall_confirmButton",
+  confirmPrimary: "dshRecall_confirmPrimary",
+  error: "dshRecall_error"
+};
+var CSS = [
+  `.${S.row}{flex-direction:column;align-items:flex-end;gap:6px;display:flex}`,
+  `.${S.actionRow}{height:calc(28px + var(--dsh-content-font-delta,0px));align-items:center;gap:8px;display:flex}`,
+  `.${S.time}{font-size:var(--dsh-content-font-size-secondary,13px);line-height:calc(24px + var(--dsh-content-font-delta,0px));color:var(--dsw-alias-label-tertiary);white-space:nowrap;padding-right:12px}`,
+  `.${S.action}{width:calc(28px + var(--dsh-content-font-delta,0px));height:calc(28px + var(--dsh-content-font-delta,0px));border-radius:var(--dsw-radius-sm);color:var(--dsw-alias-label-tertiary);cursor:pointer;background:0 0;border:none;justify-content:center;align-items:center;padding:6px;display:inline-flex}`,
+  `.${S.action} svg{width:calc(15px + var(--dsh-content-font-delta,0px));height:calc(15px + var(--dsh-content-font-delta,0px))}`,
+  `.${S.action}:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-secondary)}`,
+  `.${S.action}:disabled{cursor:default;opacity:.4}`,
+  `.${S.action}:disabled:hover{color:var(--dsw-alias-label-tertiary);background:0 0}`,
+  `.${S.action}:focus-visible{outline:1.5px solid var(--dsw-focus-ring-color,var(--dsw-alias-state-business-primary));outline-offset:1px}`,
+  `.${S.confirm}{min-height:calc(28px + var(--dsh-content-font-delta,0px));box-sizing:border-box;align-items:center;gap:2px;max-width:100%;border:.5px solid var(--dsw-alias-border-l2);border-radius:999px;background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-secondary);padding:2px 4px 2px 12px;font-size:var(--dsh-content-font-size-secondary,13px);line-height:18px;display:flex}`,
+  `.${S.confirmText}{min-width:0;padding-right:4px;overflow-wrap:anywhere}`,
+  `.${S.confirmButton}{border:none;border-radius:999px;background:0 0;color:var(--dsw-alias-label-primary);font:inherit;white-space:nowrap;cursor:pointer;padding:4px 10px}`,
+  `.${S.confirmButton}:hover:not(:disabled){background:var(--dsw-alias-interactive-bg-hover)}`,
+  `.${S.confirmButton}:disabled{cursor:default;opacity:.4}`,
+  `.${S.confirmPrimary}{color:var(--dsw-alias-state-error-primary)}`,
+  `.${S.confirmPrimary}:hover:not(:disabled){background:var(--dsw-alias-interactive-bg-hover-danger)}`,
+  `.${S.confirmButton}:focus-visible{outline:1.5px solid var(--dsw-focus-ring-color,var(--dsw-alias-state-business-primary));outline-offset:1px}`,
+  `.${S.error}{max-width:100%;color:var(--dsw-alias-state-error-primary);font-size:12px;line-height:18px;overflow-wrap:anywhere}`,
+  "@media (hover:hover){",
+  `.${S.later} .${S.actionRow}{opacity:0;transition:opacity 80ms}`,
+  `.${S.later}:hover .${S.actionRow},.${S.later}:focus-within .${S.actionRow}{opacity:1}`,
+  "}",
+  "@media (prefers-reduced-motion:reduce){",
+  `.${S.later} .${S.actionRow}{transition:none}`,
+  "}"
+].join("");
+function installStyles() {
+  if (typeof document === "undefined") return () => {
+  };
+  const tag = document.createElement("style");
+  tag.dataset.plugin = "@local/dsh-message-recall";
+  tag.dataset.pluginCss = STYLE_ID;
+  tag.textContent = CSS;
+  document.head.appendChild(tag);
+  return () => {
+    tag.remove();
+  };
+}
+var pad2 = (value) => value < 10 ? `0${String(value)}` : String(value);
+function formatClock(time, t, now = Date.now()) {
+  const date = new Date(time);
+  const today = new Date(now);
+  const clock = `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+  if (date.getFullYear() === today.getFullYear() && date.getMonth() === today.getMonth() && date.getDate() === today.getDate()) {
+    return clock;
+  }
+  const params = { y: String(date.getFullYear()), m: String(date.getMonth() + 1), d: String(date.getDate()) };
+  const stamp = date.getFullYear() === today.getFullYear() ? t("clock.md", params) : t("clock.ymd", params);
+  return `${stamp} ${clock}`;
+}
+function contentParts(content) {
+  const texts = [];
+  const attachments = [];
+  const rest = [];
+  if (Array.isArray(content)) {
+    for (const block of content) {
+      if (block === null || typeof block !== "object") {
+        rest.push(block);
+        continue;
+      }
+      const record = block;
+      if (record.type === "text" && typeof record.text === "string") {
+        texts.push(record.text);
+      } else if (record.type === "image" && record.attachment !== void 0) {
+        attachments.push({ type: "image", image: { attachment: record.attachment } });
+      } else if (record.type === "file" && record.attachment !== void 0) {
+        attachments.push({ type: "file", file: record.attachment });
+      } else {
+        rest.push(block);
+      }
+    }
+  }
+  return { text: texts.join(""), attachments, rest };
+}
+function writeClipboard(text) {
+  if (typeof navigator === "undefined" || navigator.clipboard === void 0) return Promise.resolve(false);
+  if (typeof navigator.clipboard.writeText !== "function") return Promise.resolve(false);
+  return navigator.clipboard.writeText(text).then(
+    () => true,
+    () => false
+  );
+}
+function RecallGlyph() {
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: 1.4, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": "true", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M5.8 3.6 3 6.4l2.8 2.8" }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M3 6.4h6.1A3.9 3.9 0 0 1 13 10.3v.9" })
+  ] });
+}
+function CopyGlyph() {
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: 1.4, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": "true", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { x: 5.7, y: 5.7, width: 7.6, height: 7.6, rx: 1.7 }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M10.3 3.5H4.9A1.4 1.4 0 0 0 3.5 4.9v5.4" })
+  ] });
+}
+function CheckGlyph() {
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", { viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": "true", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "m3.5 8.4 2.9 2.9 6.1-6.6" }) });
+}
+function createRecall(ctx) {
+  const timers = /* @__PURE__ */ new Set();
+  const later = (fn, ms) => {
+    const id = setTimeout(() => {
+      timers.delete(id);
+      fn();
+    }, ms);
+    timers.add(id);
+  };
+  const prefill = (sessionId, text) => {
+    if (text === "") return;
+    const conversation = ctx.get("conversation");
+    if (conversation === void 0 || conversation.input === void 0) return;
+    const input = conversation.input;
+    let attempts = 0;
+    const applyDraft = () => {
+      attempts += 1;
+      const binding = ctx.sessions.binding(sessionId);
+      if (binding !== void 0) {
+        try {
+          const outcome = input.requestDraftInitialization(binding, { prompt: text, clearPreviousDraft: true });
+          if (outcome === "applied") return;
+        } catch {
+        }
+      }
+      if (attempts < 80) later(applyDraft, 50);
+    };
+    later(applyDraft, 0);
+  };
+  return {
+    dispose() {
+      for (const id of timers) clearTimeout(id);
+      timers.clear();
+    },
+    /**
+     * Fork at `atSeq`, open the fork, restore the prompt, archive the source.
+     * @param sessionId - source Session.
+     * @param atSeq - inclusive cut: the event immediately before the recalled message.
+     * @param text - recalled prompt text restored into the fork's composer.
+     * @returns the fork's Session identity.
+     */
+    async recall(sessionId, atSeq, text) {
+      const childId = await ctx.sessions.fork({ sessionId, atSeq });
+      ctx.uiWorkspace.openSession(childId);
+      prefill(childId, text);
+      try {
+        await ctx.uiWorkspace.archiveSession(sessionId, { stopActivity: true });
+      } catch (error) {
+        console.warn("[dsh-message-recall] could not archive the recalled conversation:", error);
+      }
+      return childId;
+    }
+  };
+}
+function UserRecallRow(props) {
+  const { node, renderFactorySlot, loadImage, t, sessionId, useChat, useAccess, useSessionStatus, recall } = props;
+  const data = node.data;
+  const content = data.content;
+  const parts = (0, import_react.useMemo)(() => contentParts(content), [content]);
+  const prepared = (0, import_react.useMemo)(
+    () => ({
+      text: parts.text,
+      attachments: parts.attachments,
+      extraBlocks: parts.rest,
+      ...data.referenceLabels === void 0 ? {} : { referenceLabels: data.referenceLabels }
+    }),
+    [parts, data.referenceLabels]
+  );
+  const facts = (0, import_react.useMemo)(
+    () => ({
+      ...data.referenceLabels === void 0 ? {} : { sessionLabels: data.referenceLabels },
+      ...data.skillNames === void 0 ? {} : { skillNames: data.skillNames }
+    }),
+    [data.referenceLabels, data.skillNames]
+  );
+  const [phase, setPhase] = (0, import_react.useState)("idle");
+  const [failure, setFailure] = (0, import_react.useState)(null);
+  const [copied, setCopied] = (0, import_react.useState)(false);
+  const copyTimer = (0, import_react.useRef)(null);
+  (0, import_react.useEffect)(
+    () => () => {
+      if (copyTimer.current !== null) clearTimeout(copyTimer.current);
+    },
+    []
+  );
+  const messageSeq = typeof data.seq === "number" ? data.seq : node.anchorSeq;
+  const laterUsers = useChat((snapshot) => {
+    let count = 0;
+    for (const candidate of snapshot.nodes.values()) {
+      if (candidate.anchorSeq > node.anchorSeq && (candidate.kind === "user" || candidate.kind === "steering")) count += 1;
+    }
+    return count;
+  });
+  const canFork = useAccess("session/fork");
+  const running = useSessionStatus((statuses) => statuses.get(sessionId)?.running === true);
+  const unavailable = messageSeq <= 0 ? t("recallFirst") : running ? t("recallUnavailable") : null;
+  const onCopy = (0, import_react.useCallback)(() => {
+    if (copied) return;
+    writeClipboard(parts.text).then((ok) => {
+      if (!ok) return;
+      setCopied(true);
+      copyTimer.current = setTimeout(() => {
+        copyTimer.current = null;
+        setCopied(false);
+      }, 1e3);
+    });
+  }, [copied, parts.text]);
+  const onConfirm = (0, import_react.useCallback)(async () => {
+    setPhase("busy");
+    setFailure(null);
+    try {
+      await recall(sessionId, messageSeq - 1, parts.text);
+      setPhase("idle");
+    } catch (error) {
+      setPhase("idle");
+      setFailure(error instanceof Error ? error.message : String(error));
+    }
+  }, [messageSeq, parts.text, recall, sessionId]);
+  const confirming = phase === "confirm" || phase === "busy";
+  const rowClass = S.row + (laterUsers > 0 && !confirming ? ` ${S.later}` : "");
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: rowClass, "data-message-recall": "", children: [
+    renderFactorySlot("conversation.chat.user.content", { content: prepared, loadImage, facts, interactive: true }),
+    confirming ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: S.confirm, role: "group", "aria-label": t("recall"), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: S.confirmText, children: phase === "busy" ? t("recalling") : laterUsers > 0 ? t("confirmMore", { count: laterUsers }) : t("confirmOne") }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: `${S.confirmButton} ${S.confirmPrimary}`, disabled: phase === "busy", onClick: onConfirm, children: t("confirm") }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { type: "button", className: S.confirmButton, disabled: phase === "busy", onClick: () => setPhase("idle"), children: t("cancel") })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: S.actionRow, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: S.time, children: formatClock(data.time, t) }),
+      canFork ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+        "button",
+        {
+          type: "button",
+          className: S.action,
+          "aria-label": t("recall"),
+          title: unavailable ?? t("recall"),
+          disabled: unavailable !== null,
+          onClick: () => setPhase("confirm"),
+          children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RecallGlyph, {})
+        }
+      ) : null,
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+        "button",
+        {
+          type: "button",
+          className: S.action,
+          "aria-label": copied ? t("copied") : t("copy"),
+          title: copied ? t("copied") : t("copy"),
+          onClick: onCopy,
+          children: copied ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckGlyph, {}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CopyGlyph, {})
+        }
+      )
+    ] }),
+    failure === null ? null : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: S.error, role: "status", children: t("failed", { message: failure }) })
+  ] });
+}
+var inject = ["slots", "locale", "sessions", "uiWorkspace"];
+function apply(ctx) {
+  ctx.effect(() => installStyles(), "message-recall: styles");
+  ctx.effect(() => ctx.locale.register(NS, { zh, en }), "message-recall: dictionaries");
+  const worker = createRecall(ctx);
+  ctx.effect(() => () => worker.dispose(), "message-recall: pending timers");
+  ctx.slots.inject(
+    "conversation.chat.node",
+    () => ctx.slots.register(
+      {
+        name: "conversation.chat.node",
+        key: "user",
+        /* Lowest priority wins a keyed cell; the shipped renderer sits at 0. */
+        priority: -10,
+        locale: NS,
+        inject: () => ({ recall: worker.recall })
+      },
+      UserRecallRow
+    )
+  );
+}
+return module.exports; } });

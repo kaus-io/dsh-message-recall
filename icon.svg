@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Message Recall">
+  <rect x="1" y="1" width="62" height="62" rx="15" fill="#232838"/>
+  <rect x="12" y="11" width="40" height="25" rx="9" fill="#4D6BFE"/>
+  <path d="M20 36h7l-4.5 6.5z" fill="#4D6BFE"/>
+  <path d="M46 50H23" fill="none" stroke="#E8ECFF" stroke-width="4" stroke-linecap="round"/>
+  <path d="m29 44-7 6 7 6" fill="none" stroke="#E8ECFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
